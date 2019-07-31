@@ -21,6 +21,10 @@ class User extends Model {
     })
   }
 
+  static get hidden () {
+    return ['password']
+  }
+
   tokens () {
     return this.hasMany('App/Models/Token')
   }
@@ -29,6 +33,36 @@ class User extends Model {
     return this.belongsToMany('App/Models/Team').pivotModel(
       'App/Models/UserTeam'
     )
+  }
+
+  /** Método adicionado para trazer o UserTeam do usuário logado no momento */
+  teamJoins () {
+    return this.hasMany('App/Models/UserTeam')
+  }
+
+  /** Sobreescrita dos métodos de permissão */
+  async is (expression) {
+    const team = await this.teamJoins()
+      .where('team_id', this.currentTeam)
+      .first()
+
+    return team.is(expression)
+  }
+
+  async can (expression) {
+    const team = await this.teamJoins()
+      .where('team_id', this.currentTeam)
+      .first()
+
+    return team.can(expression)
+  }
+
+  async scope (required) {
+    const team = await this.teamJoins()
+      .where('team_id', this.currentTeam)
+      .first()
+
+    return team.scope(required)
   }
 }
 
