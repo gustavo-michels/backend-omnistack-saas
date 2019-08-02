@@ -14,7 +14,7 @@ class Team {
       return response.status(401).send()
     }
 
-    auth.user.currentTem = team.id
+    auth.user.currentTeam = team.id
     request.team = team
 
     await next()
